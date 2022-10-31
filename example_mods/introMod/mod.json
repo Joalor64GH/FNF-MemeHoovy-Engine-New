@@ -1,0 +1,14 @@
+{
+	"title":"introMod",
+	"description":"Adds a new line to introText.txt",
+	"homepage": "https://github.com/MemeHoovy/FNF-MemeHoovy-Engine-New/tree/master/example_mods/introMod",
+	"contributors": [
+		{
+			"name": "MemeHoovy",
+			"role": "Developer"
+		}
+	],
+	"api_version":"0.2.6",
+	"mod_version":"1.0.0",
+	"license":"Apache 2.0"
+}
