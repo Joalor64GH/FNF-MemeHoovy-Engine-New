@@ -8,6 +8,8 @@ No, it's not dead, I've just been busy.
 
 # THIS ENGINE IS STILL A WORK IN PROGRESS, REPORT BUGS IN ISSUES.
 
+Also if you make a mod with this engine, credit me, Brandon, & Wither, and also open source your mods too you goons.
+
 ### Special Thanks:
 
 [Stillic](https://github.com/Stilic) - Polymod fix.
@@ -15,6 +17,8 @@ No, it's not dead, I've just been busy.
 [504brandon](https://github.com/504brandon) - Assistant Programmer. (And shit I took from Nike engine lol.)
 
 [Wither362](https://github.com/Wither362) - Contributor & Assistant Programmer.
+
+[Yoshubs](https://github.com/Yoshubs) - Some inspiration.
 
 Original repo: https://github.com/MemeHoovy/FNF-MemeHoovy-Engine-Public-Legacy
 
@@ -29,7 +33,7 @@ IF YOU MAKE A MOD AND DISTRIBUTE A MODIFIED / RECOMPILED VERSION, YOU MUST OPEN 
 
 ## Credits / shoutouts
 
-- [ninjamuffin99 (me!)](https://twitter.com/ninja_muffin99) - Programmer
+- [ninjamuffin99](https://twitter.com/ninja_muffin99) - Programmer
 - [PhantomArcade3K](https://twitter.com/phantomarcade3k) and [Evilsk8r](https://twitter.com/evilsk8r) - Art
 - [Kawaisprite](https://twitter.com/kawaisprite) - Musician
 
