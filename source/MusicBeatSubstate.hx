@@ -3,6 +3,9 @@ package;
 import Conductor.BPMChangeEvent;
 import flixel.FlxG;
 import flixel.FlxSubState;
+#if GAMEJOLT_ALLOWED
+import gamejolt.GJClient;
+#end
 
 class MusicBeatSubstate extends FlxSubState
 {
@@ -10,9 +13,6 @@ class MusicBeatSubstate extends FlxSubState
 	{
 		super();
 	}
-
-	private var lastBeat:Float = 0;
-	private var lastStep:Float = 0;
 
 	private var curStep:Int = 0;
 	private var curBeat:Int = 0;
@@ -23,7 +23,7 @@ class MusicBeatSubstate extends FlxSubState
 
 	override function update(elapsed:Float)
 	{
-		//everyStep();
+		// everyStep();
 		var oldStep:Int = curStep;
 
 		updateCurStep();
@@ -32,6 +32,9 @@ class MusicBeatSubstate extends FlxSubState
 		if (oldStep != curStep && curStep > 0)
 			stepHit();
 
+		#if GAMEJOLT_ALLOWED
+		GJClient.pingSession();
+		#end
 
 		super.update(elapsed);
 	}
@@ -60,6 +63,6 @@ class MusicBeatSubstate extends FlxSubState
 
 	public function beatHit():Void
 	{
-		//do literally nothing dumbass
+		// do literally nothing dumbass
 	}
 }

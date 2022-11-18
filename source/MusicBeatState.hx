@@ -6,12 +6,12 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.ui.FlxUIState;
 import flixel.math.FlxRect;
 import flixel.util.FlxTimer;
+#if GAMEJOLT_ALLOWED
+import gamejolt.GJClient;
+#end
 
 class MusicBeatState extends FlxUIState
 {
-	private var lastBeat:Float = 0;
-	private var lastStep:Float = 0;
-
 	private var curStep:Int = 0;
 	private var curBeat:Int = 0;
 	private var controls(get, never):Controls;
@@ -21,6 +21,7 @@ class MusicBeatState extends FlxUIState
 
 	override function create()
 	{
+		destroySubStates = false; // Avoid Crashing with SubMenus on theur reutilization
 		if (transIn != null)
 			trace('reg ' + transIn.region);
 
@@ -29,7 +30,7 @@ class MusicBeatState extends FlxUIState
 
 	override function update(elapsed:Float)
 	{
-		//everyStep();
+		// everyStep();
 		var oldStep:Int = curStep;
 
 		updateCurStep();
@@ -38,9 +39,13 @@ class MusicBeatState extends FlxUIState
 		if (oldStep != curStep && curStep > 0)
 			stepHit();
 
-		if(FlxG.stage != null)
-			if(FlxG.stage.frameRate != 150)
+		if (FlxG.stage != null)
+			if (FlxG.stage.frameRate != 150)
 				FlxG.stage.frameRate = 150;
+
+		#if GAMEJOLT_ALLOWED
+		GJClient.pingSession();
+		#end
 
 		super.update(elapsed);
 	}
@@ -74,6 +79,6 @@ class MusicBeatState extends FlxUIState
 
 	public function beatHit():Void
 	{
-		//do literally nothing dumbass
+		// do literally nothing dumbass
 	}
 }

@@ -4,6 +4,7 @@ import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
+import ui.PreferencesMenu;
 
 using StringTools;
 
@@ -22,14 +23,11 @@ class Note extends FlxSprite
 	public var isSustainNote:Bool = false;
 
 	public static var swagWidth:Float = 160 * 0.7;
-	public static var PURP_NOTE:Int = 0;
-	public static var GREEN_NOTE:Int = 2;
-	public static var BLUE_NOTE:Int = 1;
-	public static var RED_NOTE:Int = 3;
 
 	public var noteType(default, set):String;
 
-	function set_noteType(daType:String){
+	function set_noteType(daType:String)
+	{
 		return noteType = daType; // unfinished
 	}
 
@@ -119,9 +117,12 @@ class Note extends FlxSprite
 				animation.play('redScroll');
 		}
 
-		if (Config.downscroll && sustainNote){
+		if (PreferencesMenu.getPref('downscroll') && sustainNote)
+		{
 			flipY = true;
-		}else{
+		}
+		else
+		{
 			flipY = false;
 		}
 

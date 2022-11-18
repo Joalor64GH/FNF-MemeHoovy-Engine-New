@@ -15,6 +15,13 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import lime.app.Application;
+#if GAMEJOLT_ALLOWED
+import gamejolt.GJClient;
+import gamejolt.extras.Popup;
+import gamejolt.formats.User;
+#end
+import ui.PreferencesMenu;
+import ui.OptionsState;
 
 using StringTools;
 
@@ -29,7 +36,7 @@ class MainMenuState extends MusicBeatState
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 
-	static inline final engineVersion:String = '0.1.0';
+	static inline final engineVersion:String = '0.1.0-Pre-Alpha';
 
 	override function create()
 	{
@@ -43,7 +50,7 @@ class MainMenuState extends MusicBeatState
 
 		if (!FlxG.sound.music.playing)
 		{
-			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			CoolUtil.resetMusic();
 		}
 
 		persistentUpdate = persistentDraw = true;
@@ -69,8 +76,9 @@ class MainMenuState extends MusicBeatState
 		magenta.visible = false;
 		magenta.antialiasing = true;
 		magenta.color = 0xFFfd719b;
-		add(magenta);
-		// magenta.scrollFactor.set();
+
+		if (PreferencesMenu.getPref('flashing-menu'))
+			add(magenta);
 
 		menuItems = new FlxTypedGroup<FlxSprite>();
 		add(menuItems);
@@ -93,12 +101,21 @@ class MainMenuState extends MusicBeatState
 
 		FlxG.camera.follow(camFollow, null, 0.06);
 
-		var versionShit:FlxText = new FlxText(5, FlxG.height - 18, 0, "MemeHoovy Engine v" + engineVersion + ' FNF v' + Application.current.meta.get('version'), 12);
+		var versionShit:FlxText = new FlxText(5, FlxG.height - 33, 0,
+			"MemeHoovy Engine v" + engineVersion + '\nFNF v' + Application.current.meta.get('version'), 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
 
 		changeItem();
+
+		#if GAMEJOLT_ALLOWED
+		GJClient.initialize(function (user:User)
+		{
+			FlxG.sound.play(Paths.sound('confirmMenu'));
+			add(new Popup(user.developer_name, "You're successfully logged in!"));
+		});
+		#end
 
 		super.create();
 	}
@@ -130,6 +147,13 @@ class MainMenuState extends MusicBeatState
 			{
 				FlxG.switchState(new TitleState());
 			}
+
+			#if GAMEJOLT_ALLOWED
+			if (FlxG.keys.justPressed.SEVEN)
+			{
+				FlxG.switchState(new gamejolt.menus.GJOptionsState());
+			}
+			#end
 
 			if (controls.ACCEPT)
 			{
@@ -173,11 +197,9 @@ class MainMenuState extends MusicBeatState
 										trace("Story Menu Selected");
 									case 'freeplay':
 										FlxG.switchState(new FreeplayState());
-
 										trace("Freeplay Menu Selected");
-
 									case 'options':
-										FlxG.switchState(new OptionsBeta());
+										FlxG.switchState(new OptionsState());
 								}
 							});
 						}

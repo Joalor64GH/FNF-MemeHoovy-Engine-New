@@ -6,6 +6,8 @@ No, it's not dead, I've just been busy.
 
 ![Repo size](https://img.shields.io/github/repo-size/MemeHoovy/FNF-MemeHoovy-Engine-New)
 
+Discord Server: https://discord.gg/vS2rY5VaMV
+
 # THIS ENGINE IS STILL A WORK IN PROGRESS, REPORT BUGS IN ISSUES.
 
 Also if you make a mod with this engine, credit me, Brandon, & Wither, and also open source your mods too you goons.
@@ -14,13 +16,29 @@ Also if you make a mod with this engine, credit me, Brandon, & Wither, and also 
 
 [Stillic](https://github.com/Stilic) - Polymod fix.
 
-[504brandon](https://github.com/504brandon) - Assistant Programmer. (And shit I took from Nike engine lol.)
+[504brandon](https://github.com/504brandon) - Assistant Programmer. (And shit I took from Dike/Lite engine lol.)
 
 [Wither362](https://github.com/Wither362) - Contributor & Assistant Programmer.
 
+[GamerPablito](https://github.com/GamerPablito) - Contributor & gamejolt support.
+
 [Yoshubs](https://github.com/Yoshubs) - Some inspiration.
 
+[Starmapo](https://github.com/Starmapo) - Inspiration & Hscript things. (And also being a cool person)
+
+[Angel Bot](https://github.com/AngelDTF) - Inspiration & Week 7 shit. (Reverse engineered it)
+
+[M&M](https://github.com/ActualMandM) - Week 7 code.
+
+[MtH](https://github.com/PrincessMtH) - Week 7 code.
+
+[Stilic](https://github.com/Stilic) - Inspiration & Flaty Engine code, and in general, an cool person (Ily stilic, platonically).
+
 Original repo: https://github.com/MemeHoovy/FNF-MemeHoovy-Engine-Public-Legacy
+
+Also check out: [Chocolate Engine](https://github.com/Joalor64GH/Chocolate-Engine)
+
+And also check out [Lite Funkin Engine](https://github.com/504brandon/lite-funkin-engine)
 
 ### Original description:
 This is the repository for Friday Night Funkin, a game originally made for Ludum Dare 47 "Stuck In a Loop".
@@ -89,3 +107,4 @@ As for Mac, 'lime test mac -debug' should work, if not the internet surely has a
 ### Additional guides
 
 - [Command line basics](https://ninjamuffin99.newgrounds.com/news/post/1090480)
+

@@ -5,6 +5,7 @@ import flixel.graphics.frames.FlxAtlasFrames;
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
 import flixel.graphics.FlxGraphic;
+import Cache.AtlasType;
 
 using StringTools;
 
@@ -23,7 +24,7 @@ class Paths
 		currentLevel = name.toLowerCase();
 	}
 
-	static function getPath(file:String, type:AssetType, library:Null<String>)
+	static function getPath(file:String, ?type:AssetType, ?library:Null<String>)
 	{
 		if (library != null)
 			return getLibraryPath(file, library);
@@ -77,6 +78,11 @@ class Paths
 		return getPath('data/$key.json', TEXT, library);
 	}
 
+	inline static public function jsonAnywhere(key:String, ?library:String)
+	{
+		return getPath('$key.json', TEXT, library);
+	}
+
 	static public function sound(key:String, ?library:String)
 	{
 		return getPath('sounds/$key.$SOUND_EXT', SOUND, library);
@@ -89,7 +95,7 @@ class Paths
 
 	inline static public function video(key:String, ?library:String)
 	{
-		return('assets/videos/$key.mp4');
+		return ('assets/videos/$key.mp4');
 	}
 
 	inline static public function music(key:String, ?library:String)
@@ -127,6 +133,26 @@ class Paths
 		return path.toLowerCase().replace(' ', '-');
 	}
 
+	inline static public function getSparrowAtlas(key:String, ?library:String, persistUntilClear:Bool = false)
+	{
+		return returnAtlas('images/$key', Sparrow, library, persistUntilClear);
+	}
+
+	inline static public function getPackerAtlas(key:String, ?library:String, persistUntilClear:Bool = false)
+	{
+		return returnAtlas('images/$key', Packer, library, persistUntilClear);
+	}
+
+	inline static public function getSparrowAtlasLegacy(key:String, ?library:String)
+	{
+		return FlxAtlasFrames.fromSparrow(image(key, library), file('images/$key.xml', library));
+	}
+
+	inline static public function getPackerAtlasLegacy(key:String, ?library:String)
+	{
+		return FlxAtlasFrames.fromSpriteSheetPacker(image(key, library), file('images/$key.txt', library));
+	}
+
 	// Credit: MAJigsaw77
 	public static function returnGraphic(key:String, ?cache:Bool = true):FlxGraphic
 	{
@@ -146,15 +172,21 @@ class Paths
 
 		trace('oh no $key its returning null NOOOO');
 		return null;
-	}	
-
-	inline static public function getSparrowAtlas(key:String, ?library:String)
-	{
-		return FlxAtlasFrames.fromSparrow(image(key, library), file('images/$key.xml', library));
 	}
 
-	inline static public function getPackerAtlas(key:String, ?library:String)
+	// Credit: Stilic
+	public static function returnAtlas(key:String, type:AtlasType, ?library:String, persistUntilClear:Bool = false)
 	{
-		return FlxAtlasFrames.fromSpriteSheetPacker(image(key, library), file('images/$key.txt', library));
+		var path = getPath('$key.png', IMAGE, library);
+		var atlas = Cache.getAtlas(path, type);
+		if (atlas != null)
+		{
+			if (persistUntilClear)
+				Cache.persistantAssets.set(path, true);
+			return atlas;
+		}
+
+		trace('oh no ${key} is returning null NOOOO');
+		return null;
 	}
 }

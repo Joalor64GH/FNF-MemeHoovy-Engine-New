@@ -4,7 +4,6 @@ package;
 import mobile.Hitbox;
 import mobile.ControlsMobile;
 #end
-
 import haxe.DynamicAccess;
 import haxe.Json;
 import haxe.ds.EnumValueMap;
@@ -15,7 +14,7 @@ import flixel.input.actions.FlxActionInput;
 import flixel.input.actions.FlxActionInputDigital;
 import flixel.input.actions.FlxActionManager;
 import flixel.input.actions.FlxActionSet;
-import flixel.input.gamepad.FlxGamepadButton;
+import flixel.input.gamepad.FlxGamepad;
 import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.input.keyboard.FlxKey;
 
@@ -162,8 +161,9 @@ class Controls extends FlxActionSet
 	var byName:Map<String, FlxActionDigital> = new Map<String, FlxActionDigital>();
 	#end
 
-	public var gamepadsAdded:Array<Int> = [];
 	public var keyboardScheme = KeyboardScheme.None;
+
+	public var gamepads(default, null):Array<Int> = [];
 
 	public var UI_UP(get, never):Bool;
 
@@ -380,10 +380,12 @@ class Controls extends FlxActionSet
 
 		for (action in digitalActions)
 			byName[action.name] = action;
-			
+
 		if (scheme == null)
 			scheme = None;
 		setKeyboardScheme(scheme, false);
+
+		FlxG.gamepads.deviceDisconnected.add(onGamepadDisconnection);
 	}
 	#end
 
@@ -461,21 +463,22 @@ class Controls extends FlxActionSet
 
 	public function replaceBinding(control:Control, device:Device, toAdd:Int, toRemove:Int)
 	{
-		if (toAdd != toRemove) switch (device)
-		{
-			case Keys:
-				forEachBound(control, function(action, state)
-				{
-					replaceKey(action, toAdd, toRemove);
-				});
-			case Gamepad(id):
-				forEachBound(control, function(action, state)
-				{
-					replaceButton(action, id, toAdd, toRemove);
-				});
-		}
+		if (toAdd != toRemove)
+			switch (device)
+			{
+				case Keys:
+					forEachBound(control, function(action, state)
+					{
+						replaceKey(action, toAdd, toRemove);
+					});
+				case Gamepad(id):
+					forEachBound(control, function(action, state)
+					{
+						replaceButton(action, id, toAdd, toRemove);
+					});
+			}
 	}
-	
+
 	public function replaceKey(action:FlxActionDigital, toAdd:Int, toRemove:Int)
 	{
 		for (i in 0...action.inputs.length)
@@ -495,6 +498,7 @@ class Controls extends FlxActionSet
 				@:privateAccess action.inputs[i].inputID = toAdd;
 		}
 	}
+
 	/**
 	 * Sets all actions that pertain to the binder to trigger when the supplied keys are used.
 	 * If binder is a literal you can inline this
@@ -520,7 +524,7 @@ class Controls extends FlxActionSet
 			removeKeyboard();
 
 		keyboardScheme = scheme;
-		
+
 		#if (haxe >= "4.0.0")
 		switch (scheme)
 		{
@@ -628,10 +632,34 @@ class Controls extends FlxActionSet
 		}
 	}
 
-	public function addGamepadWithSaveData(id, data)
+	function removeGamepad(id:Int)
 	{
-		gamepadsAdded.push(id);
-		fromSaveData(data, Device.Gamepad(id));
+		for (action in digitalActions)
+		{
+			var i = action.inputs.length;
+			while (i-- > 0)
+			{
+				var input = action.inputs[i];
+				if (input.device == GAMEPAD && input.deviceID == id)
+					action.remove(input);
+			}
+		}
+
+		gamepads.remove(id);
+	}
+
+	function onGamepadDisconnection(pad:FlxGamepad)
+	{
+		removeGamepad(pad.id);
+	}
+
+	public function addGamepadWithSaveData(id:Int, data)
+	{
+		if (gamepads.contains(id))
+			removeGamepad(id);
+		else
+			gamepads.push(id);
+		fromSaveData(data, Gamepad(id));
 	}
 
 	public function addDefaultGamepad(id):Void
@@ -651,23 +679,26 @@ class Controls extends FlxActionSet
 		map.set(Control.PAUSE, [START]);
 		map.set(Control.RESET, [Y]);
 		#else
-		//Swap A and B for switch
+		// Swap A and B for switch
 		map.set(Control.ACCEPT, [B]);
 		map.set(Control.BACK, [A, BACK]);
 		map.set(Control.UI_UP, [DPAD_UP, LEFT_STICK_DIGITAL_UP]);
 		map.set(Control.UI_DOWN, [DPAD_DOWN, LEFT_STICK_DIGITAL_DOWN]);
 		map.set(Control.UI_LEFT, [DPAD_LEFT, LEFT_STICK_DIGITAL_LEFT]);
 		map.set(Control.UI_RIGHT, [DPAD_RIGHT, LEFT_STICK_DIGITAL_RIGHT]);
-		//Swap A-B / X-Y for switch
+		// Swap A-B / X-Y for switch
 		map.set(Control.NOTE_UP, [DPAD_UP, X, LEFT_STICK_DIGITAL_UP, RIGHT_STICK_DIGITAL_UP]);
 		map.set(Control.NOTE_DOWN, [DPAD_DOWN, B, LEFT_STICK_DIGITAL_DOWN, RIGHT_STICK_DIGITAL_DOWN]);
 		map.set(Control.NOTE_LEFT, [DPAD_LEFT, Y, LEFT_STICK_DIGITAL_LEFT, RIGHT_STICK_DIGITAL_LEFT]);
 		map.set(Control.NOTE_RIGHT, [DPAD_RIGHT, A, LEFT_STICK_DIGITAL_RIGHT, RIGHT_STICK_DIGITAL_RIGHT]);
 		map.set(Control.PAUSE, [START]);
-		//Swap Y and X for switch
+		// Swap Y and X for switch
 		map.set(Control.RESET, [Y]);
 		#end
-		gamepadsAdded.push(id);
+		if (gamepads.contains(id))
+			removeGamepad(id);
+		else
+			gamepads.push(id);
 		var keys;
 		while ((keys = map.keys()).hasNext())
 		{
@@ -723,13 +754,14 @@ class Controls extends FlxActionSet
 		for (button in Control.createAll())
 		{
 			var inputs:Dynamic = Reflect.field(data, button.getName());
-			if (inputs != null) switch (device)
-			{
-				case Keys:
-					bindKeys(button, inputs);
-				case Gamepad(id):
-					bindButtons(button, id, inputs);
-			}
+			if (inputs != null)
+				switch (device)
+				{
+					case Keys:
+						bindKeys(button, inputs);
+					case Gamepad(id):
+						bindButtons(button, id, inputs);
+				}
 		}
 	}
 
@@ -747,20 +779,26 @@ class Controls extends FlxActionSet
 	}
 
 	#if mobile
-	public function setHitBoxNOTES(hitbox:Hitbox) 
+	public function setHitBoxNOTES(hitbox:Hitbox)
 	{
 		inline forEachBound(Control.NOTE_UP, (action, state) -> addbuttonuNOTES(action, hitbox.buttonUp, state));
 		inline forEachBound(Control.NOTE_DOWN, (action, state) -> addbuttonuNOTES(action, hitbox.buttonDown, state));
 		inline forEachBound(Control.NOTE_LEFT, (action, state) -> addbuttonuNOTES(action, hitbox.buttonLeft, state));
-		inline forEachBound(Control.NOTE_RIGHT, (action, state) -> addbuttonuNOTES(action, hitbox.buttonRight, state));	
+		inline forEachBound(Control.NOTE_RIGHT, (action, state) -> addbuttonuNOTES(action, hitbox.buttonRight, state));
 	}
 
-	public function setHitBoxUI(hitbox:Hitbox) 
+	public function setHitBoxUI(hitbox:Hitbox)
 	{
 		inline forEachBound(Control.UI_UP, (action, state) -> addbuttonuUI(action, hitbox.buttonUp, state));
 		inline forEachBound(Control.UI_DOWN, (action, state) -> addbuttonuUI(action, hitbox.buttonDown, state));
 		inline forEachBound(Control.UI_LEFT, (action, state) -> addbuttonuUI(action, hitbox.buttonLeft, state));
-		inline forEachBound(Control.UI_RIGHT, (action, state) -> addbuttonuUI(action, hitbox.buttonRight, state));	
+		inline forEachBound(Control.UI_RIGHT, (action, state) -> addbuttonuUI(action, hitbox.buttonRight, state));
 	}
 	#end
+
+	override function destroy()
+	{
+		FlxG.gamepads.deviceDisconnected.remove(onGamepadDisconnection);
+		super.destroy();
+	}	
 }
